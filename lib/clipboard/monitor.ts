@@ -1,5 +1,3 @@
-import * as Clipboard from 'expo-clipboard';
-
 import type { ClipboardContentType } from '@/lib/models/clipboard';
 
 export interface ClipboardSnapshot {
@@ -20,22 +18,32 @@ export type ClipboardImageContent = {
   format?: string;
 };
 
-function fingerprint(snapshot: ClipboardSnapshot): string {
-  return JSON.stringify({
-    type: snapshot.contentType,
-    text: snapshot.text ?? null,
-    html: snapshot.html ?? null,
-    imageKey: snapshot.image ? `${snapshot.image.width}x${snapshot.image.height}:${snapshot.image.data.length}` : null,
-  });
+type ExpoClipboardModule = typeof import('expo-clipboard');
+
+let clipboardModulePromise: Promise<ExpoClipboardModule | null> | null = null;
+
+async function loadClipboardModule(): Promise<ExpoClipboardModule | null> {
+  if (!clipboardModulePromise) {
+    clipboardModulePromise = import('expo-clipboard')
+      .then((module) => module)
+      .catch((error) => {
+        console.warn('[clipboard] expo-clipboard unavailable; attempting browser fallback', error);
+        return null;
+      });
+  }
+  return clipboardModulePromise;
 }
 
 async function readClipboard(): Promise<ClipboardSnapshot | null> {
   try {
-    if (typeof Clipboard.getContentAsync === 'function') {
+    const Clipboard = await loadClipboardModule();
+
+    if (Clipboard?.getContentAsync) {
       const content = await Clipboard.getContentAsync();
       if (!content) {
         return null;
       }
+
       if (content.text) {
         return {
           contentType: 'text',
@@ -43,6 +51,7 @@ async function readClipboard(): Promise<ClipboardSnapshot | null> {
           html: content.html ?? null,
         };
       }
+
       if (content.image) {
         return {
           contentType: 'image',
@@ -56,7 +65,7 @@ async function readClipboard(): Promise<ClipboardSnapshot | null> {
       }
     }
 
-    if (typeof Clipboard.hasStringAsync === 'function' && (await Clipboard.hasStringAsync())) {
+    if (Clipboard?.hasStringAsync && (await Clipboard.hasStringAsync())) {
       const text = await Clipboard.getStringAsync();
       return {
         contentType: 'text',
@@ -64,11 +73,38 @@ async function readClipboard(): Promise<ClipboardSnapshot | null> {
       };
     }
 
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.readText) {
+      const text = await navigator.clipboard.readText();
+      if (text) {
+        return {
+          contentType: 'text',
+          text,
+        };
+      }
+    }
+
     return null;
   } catch (error) {
     console.warn('[clipboard] Failed to read clipboard', error);
     return null;
   }
+}
+
+export async function copyTextToClipboard(text: string): Promise<boolean> {
+  try {
+    const Clipboard = await loadClipboardModule();
+    if (Clipboard?.setStringAsync) {
+      await Clipboard.setStringAsync(text);
+      return true;
+    }
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (error) {
+    console.warn('[clipboard] Failed to copy to clipboard', error);
+  }
+  return false;
 }
 
 export class ClipboardMonitor {
@@ -108,4 +144,13 @@ export class ClipboardMonitor {
     this.lastFingerprint = hash;
     await this.callback(snapshot);
   }
+}
+
+function fingerprint(snapshot: ClipboardSnapshot): string {
+  return JSON.stringify({
+    type: snapshot.contentType,
+    text: snapshot.text ?? null,
+    html: snapshot.html ?? null,
+    imageKey: snapshot.image ? `${snapshot.image.width}x${snapshot.image.height}:${snapshot.image.data.length}` : null,
+  });
 }

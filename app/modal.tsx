@@ -1,9 +1,9 @@
-import * as Clipboard from 'expo-clipboard';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { useClipboardHistory } from '@/context/clipboard-history-context';
+import { copyTextToClipboard } from '@/lib/clipboard/monitor';
 
 export default function ModalScreen() {
   const router = useRouter();
@@ -31,8 +31,12 @@ export default function ModalScreen() {
     if (!entry.text) {
       return;
     }
-    await Clipboard.setStringAsync(entry.text);
-    Alert.alert('Copied', 'The clipboard entry has been copied.');
+    const copied = await copyTextToClipboard(entry.text);
+    if (copied) {
+      Alert.alert('Copied', 'The clipboard entry has been copied.');
+    } else {
+      Alert.alert('Unable to copy', 'Clipboard access is not available in this environment.');
+    }
   };
 
   return (

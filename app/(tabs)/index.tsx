@@ -1,4 +1,3 @@
-import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { FlashList } from '@shopify/flash-list';
 import { useRouter } from 'expo-router';
@@ -14,6 +13,7 @@ import {
 } from 'react-native';
 
 import { useClipboardHistory } from '@/context/clipboard-history-context';
+import { copyTextToClipboard } from '@/lib/clipboard/monitor';
 import type { ClipboardEntry } from '@/lib/models/clipboard';
 
 export default function HistoryScreen() {
@@ -113,8 +113,10 @@ function HistoryListItem({ entry, onTogglePin, onDelete, onInspect }: HistoryLis
 
   const handleCopy = async () => {
     if (entry.text) {
-      await Clipboard.setStringAsync(entry.text);
-      await Haptics.selectionAsync();
+      const copied = await copyTextToClipboard(entry.text);
+      if (copied) {
+        await Haptics.selectionAsync();
+      }
     }
   };
 
