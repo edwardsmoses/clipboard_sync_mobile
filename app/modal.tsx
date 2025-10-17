@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -17,13 +18,20 @@ export default function ModalScreen() {
 
   if (!entry) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Entry not found</Text>
-        <Text style={styles.body}>It may have been deleted or synced from another device.</Text>
-        <Text style={styles.link} onPress={() => router.back()}>
-          Close
+      <LinearGradient colors={[ '#0f172a', '#1d4ed8' ]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.emptyState}>
+        <Text style={styles.emptyTitle}>Ready to pair?</Text>
+        <Text style={styles.emptySubtitle}>
+          Ask your Mac to show the pairing QR code, then tap the button below. We’ll reconnect you instantly.
         </Text>
-      </View>
+        <View style={styles.steps}>
+          <Text style={styles.stepText}>• Open clipboard sync on macOS</Text>
+          <Text style={styles.stepText}>• Choose “Pair new device”</Text>
+          <Text style={styles.stepText}>• Scan the QR with this phone</Text>
+        </View>
+        <Text style={styles.heroLink} onPress={() => router.back()}>
+          Return to devices
+        </Text>
+      </LinearGradient>
     );
   }
 
@@ -139,6 +147,41 @@ const styles = StyleSheet.create({
   link: {
     marginTop: 24,
     color: '#2563EB',
+    fontSize: 16,
+  },
+  emptyState: {
+    flex: 1,
+    padding: 32,
+    gap: 18,
+    justifyContent: 'center',
+    borderRadius: 32,
+    margin: 24,
+    shadowColor: '#0f172a',
+    shadowOpacity: 0.35,
+    shadowRadius: 24,
+    elevation: 8,
+  },
+  emptyTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#f9fafb',
+  },
+  emptySubtitle: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: 'rgba(255,255,255,0.82)',
+  },
+  steps: {
+    gap: 8,
+  },
+  stepText: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 14,
+  },
+  heroLink: {
+    marginTop: 12,
+    color: '#facc15',
+    fontWeight: '600',
     fontSize: 16,
   },
 });

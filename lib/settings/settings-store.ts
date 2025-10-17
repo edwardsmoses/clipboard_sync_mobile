@@ -7,6 +7,7 @@ export interface AppSettings {
   pairingToken: string | null;
   autoStartOnBoot: boolean;
   wifiOnly: boolean;
+  discoverable: boolean;
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -14,6 +15,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   pairingToken: null,
   autoStartOnBoot: true,
   wifiOnly: false,
+  discoverable: true,
 };
 
 export async function loadSettings(): Promise<AppSettings> {

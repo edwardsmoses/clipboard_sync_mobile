@@ -202,6 +202,7 @@ export function ClipboardHistoryProvider({ children }: Props) {
         endpoint: settings.endpoint,
         pairingToken: settings.pairingToken ?? undefined,
         device: state.device,
+        discoverable: settings.discoverable,
         onConnectionChange: (syncState: SyncConnectionState) =>
           dispatch({ type: 'SET_SYNC_STATE', state: syncState }),
         onClipboardEvent: (event: RemoteClipboardEvent) => {
@@ -218,8 +219,9 @@ export function ClipboardHistoryProvider({ children }: Props) {
       endpoint: settings.endpoint,
       pairingToken: settings.pairingToken ?? undefined,
       device: state.device,
+      discoverable: settings.discoverable,
     });
-  }, [state.device, settings.endpoint, settings.pairingToken, settingsReady, ingestRemoteEntry]);
+  }, [state.device, settings.discoverable, settings.endpoint, settings.pairingToken, settingsReady, ingestRemoteEntry]);
 
   useEffect(() => {
     return () => {

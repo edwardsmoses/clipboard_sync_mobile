@@ -15,6 +15,7 @@ const defaultValue: SettingsContextValue = {
     pairingToken: null,
     autoStartOnBoot: true,
     wifiOnly: false,
+    discoverable: true,
   },
   isReady: false,
   update: async () => undefined,

@@ -17,9 +17,9 @@ npx expo start --android
 
 The Android client now includes:
 
-- A timeline view with search, pinning, and quick copy-back actions.
-- A device tab that surfaces the current device identity and recently seen peers.
-- Settings where you can paste the pairing endpoint exposed by the macOS bridge and tweak sync preferences.
+- A gradient-fed timeline with quick filters, material icons, and haptic copy-back actions.
+- A Devices hub that guides pairing, shows Wi‑Fi status, and lists recently seen companions.
+- A Settings panel inspired by Contra’s glossy UI, complete with network diagnostics and a discoverability toggle.
 - Background clipboard monitoring that persists entries to SQLite and emits them to the sync layer.
 
 ## Getting started (macOS)
@@ -34,8 +34,8 @@ Open `clipboard_sync_desktop/clipboard_sync_desktop.xcodeproj` in Xcode 16 and r
 ## Pairing flow (current snapshot)
 
 1. Launch the macOS bridge — it will spin up the WebSocket listener and begin watching the pasteboard.
-2. On Android, open Settings → Sync preferences and paste the `wss://` endpoint URL along with the one-time token (UI pending).
-3. Copy text on Android to see it appear in the history list; the macOS bridge broadcasts its own clipboard events to all paired clients.
+2. On Android, check the Devices tab — both gadgets should show the same Wi‑Fi badge. Tap “Pair a device” and scan the Mac’s QR code.
+3. Copy anything and watch it glow in the new Clipboard Vault timeline; the macOS bridge broadcasts its own clipboard events to all paired clients.
 
 ## Next steps
 

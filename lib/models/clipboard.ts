@@ -33,6 +33,7 @@ export interface SyncHandshake {
   pairingToken?: string;
   supportsChunking: boolean;
   protocolVersion: string;
+  discoverable: boolean;
 }
 
 export interface SyncEnvelope<T = unknown> {

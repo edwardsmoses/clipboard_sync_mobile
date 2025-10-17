@@ -12,6 +12,7 @@ export interface SyncClientOptions {
   endpoint: string;
   pairingToken?: string;
   device: DeviceIdentity;
+  discoverable: boolean;
   onClipboardEvent?: (event: RemoteClipboardEvent) => void;
   onConnectionChange?: (state: SyncConnectionState) => void;
 }
@@ -62,6 +63,7 @@ export class SyncClient {
         pairingToken: this.options.pairingToken,
         supportsChunking: true,
         protocolVersion: '1.0.0',
+        discoverable: this.options.discoverable,
       });
       this.startHeartbeat();
     };

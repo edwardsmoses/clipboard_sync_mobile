@@ -1,16 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Alert,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useSettings } from '@/context/settings-context';
+import { useNetworkSummary } from '@/lib/network/network-status';
+import { GradientContainer } from '@/components/ui/gradient-container';
 
 export default function SettingsScreen() {
   const { settings, update, isReady } = useSettings();
@@ -18,14 +12,31 @@ export default function SettingsScreen() {
   const [pairingToken, setPairingToken] = useState(settings.pairingToken ?? '');
   const [autoStartOnBoot, setAutoStartOnBoot] = useState(settings.autoStartOnBoot);
   const [wifiOnly, setWifiOnly] = useState(settings.wifiOnly);
+  const [discoverable, setDiscoverable] = useState(settings.discoverable);
   const [isSaving, setSaving] = useState(false);
+
+  const network = useNetworkSummary();
 
   useEffect(() => {
     setEndpoint(settings.endpoint ?? '');
     setPairingToken(settings.pairingToken ?? '');
     setAutoStartOnBoot(settings.autoStartOnBoot);
     setWifiOnly(settings.wifiOnly);
+    setDiscoverable(settings.discoverable);
   }, [settings]);
+
+  const networkStatusLabel = useMemo(() => {
+    if (!network) {
+      return 'Detecting network…';
+    }
+    if (!network.isConnected) {
+      return 'Offline';
+    }
+    if (network.type === 'WIFI') {
+      return network.details?.ssid ? `Wi‑Fi · ${network.details.ssid}` : 'Wi‑Fi connected';
+    }
+    return 'Cellular connection';
+  }, [network]);
 
   const handleSave = async () => {
     try {
@@ -35,6 +46,7 @@ export default function SettingsScreen() {
         pairingToken: pairingToken.trim() || null,
         autoStartOnBoot,
         wifiOnly,
+        discoverable,
       });
     } catch (error) {
       Alert.alert('Unable to save settings', (error as Error).message);
@@ -46,139 +58,200 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.heading}>Sync preferences</Text>
-        <Text style={styles.description}>
-          Configure how this device connects to your desktop bridge and how clipboard data is synced.
-        </Text>
+        <GradientContainer colors={['#1e2a78', '#274198', '#2e54c3']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+          <Text style={styles.heroTitle}>Stay in sync</Text>
+          <Text style={styles.heroSubtitle}>Make sure both devices share the same network to pair instantly.</Text>
+          <View style={styles.heroPill}>
+            <Text style={styles.heroPillText}>{networkStatusLabel}</Text>
+          </View>
+        </GradientContainer>
 
-        <View style={styles.card}>
-          <Text style={styles.label}>Bridge endpoint</Text>
+        <View style={styles.surface}>
+          <Text style={styles.sectionTitle}>Bridge connection</Text>
+          <Text style={styles.sectionBody}>
+            Paste the secure URL exposed by the macOS bridge. We autofill everything else for you.
+          </Text>
           <TextInput
             style={styles.input}
-            placeholder="wss://hostname:port"
+            placeholder="wss://mac.local:4000"
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="url"
             value={endpoint}
             onChangeText={setEndpoint}
           />
-          <Text style={styles.helper}>This is provided by the macOS app after pairing.</Text>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.label}>Pairing token</Text>
           <TextInput
             style={styles.input}
-            placeholder="Optional token"
+            placeholder="Pairing token (optional)"
             autoCapitalize="none"
             autoCorrect={false}
             value={pairingToken}
             onChangeText={setPairingToken}
           />
-          <Text style={styles.helper}>Use the one-time code displayed on mac during pairing.</Text>
         </View>
 
-        <View style={styles.cardRow}>
-          <View style={styles.rowText}>
-            <Text style={styles.label}>Launch service at boot</Text>
-            <Text style={styles.helper}>Keeps the clipboard watcher running after device restarts.</Text>
-          </View>
-          <Switch value={autoStartOnBoot} onValueChange={setAutoStartOnBoot} />
-        </View>
-
-        <View style={styles.cardRow}>
-          <View style={styles.rowText}>
-            <Text style={styles.label}>Sync on Wi-Fi only</Text>
-            <Text style={styles.helper}>Pause sync while on cellular data to save bandwidth.</Text>
-          </View>
-          <Switch value={wifiOnly} onValueChange={setWifiOnly} />
+        <View style={styles.surface}>
+          <Text style={styles.sectionTitle}>Behaviour</Text>
+          <SettingRow
+            title="Launch watcher at boot"
+            description="Reconnect automatically when your phone restarts."
+            value={autoStartOnBoot}
+            onValueChange={setAutoStartOnBoot}
+          />
+          <SettingRow
+            title="Sync on Wi‑Fi only"
+            description="Pause while on cellular to avoid untrusted networks."
+            value={wifiOnly}
+            onValueChange={setWifiOnly}
+          />
+          <SettingRow
+            title="Make this device discoverable"
+            description="When off, your mac won’t announce this phone to new pair requests."
+            value={discoverable}
+            onValueChange={setDiscoverable}
+          />
         </View>
 
         <View style={styles.actions}>
-          <Text style={[styles.saveButton, isSaving && styles.saveButtonDisabled]} onPress={handleSave}>
+          <Text style={[styles.primaryButton, isSaving && styles.primaryButtonDisabled]} onPress={handleSave}>
             {isSaving ? 'Saving…' : 'Save changes'}
           </Text>
-          {!isReady && <Text style={styles.helper}>Loading your settings…</Text>}
+          {!isReady && <Text style={styles.helper}>Loading your preferences…</Text>}
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
+function SettingRow({
+  title,
+  description,
+  value,
+  onValueChange,
+}: {
+  title: string;
+  description: string;
+  value: boolean;
+  onValueChange: (next: boolean) => void;
+}) {
+  return (
+    <View style={styles.settingRow}>
+      <View style={styles.settingCopy}>
+        <Text style={styles.settingTitle}>{title}</Text>
+        <Text style={styles.settingDescription}>{description}</Text>
+      </View>
+      <Switch value={value} onValueChange={onValueChange} />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#eef2ff',
   },
   content: {
     padding: 24,
-    gap: 18,
+    gap: 20,
   },
-  heading: {
-    fontSize: 24,
+  hero: {
+    borderRadius: 28,
+    padding: 24,
+    shadowColor: '#1c2a60',
+    shadowOpacity: 0.25,
+    shadowRadius: 18,
+    elevation: 6,
+  },
+  heroTitle: {
+    fontSize: 26,
     fontWeight: '700',
+    color: '#fff',
   },
-  description: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 18,
-    gap: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 1,
-  },
-  cardRow: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 1,
-  },
-  rowText: {
-    flex: 1,
-    marginRight: 12,
-    gap: 6,
-  },
-  label: {
+  heroSubtitle: {
+    marginTop: 8,
     fontSize: 15,
+    lineHeight: 22,
+    color: 'rgba(255,255,255,0.75)',
+  },
+  heroPill: {
+    marginTop: 18,
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+  },
+  heroPillText: {
+    color: '#fff',
     fontWeight: '600',
   },
-  helper: {
-    fontSize: 12,
-    color: '#9CA3AF',
+  surface: {
+    backgroundColor: '#ffffff',
+    borderRadius: 24,
+    padding: 20,
+    gap: 16,
+    shadowColor: '#1e1f38',
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111826',
+  },
+  sectionBody: {
+    fontSize: 14,
+    color: '#4b5563',
   },
   input: {
     fontSize: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    backgroundColor: '#f8f9ff',
+    borderWidth: 1,
+    borderColor: '#e0e7ff',
+  },
+  settingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 16,
+  },
+  settingCopy: {
+    flex: 1,
+    gap: 6,
+  },
+  settingTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1f2937',
+  },
+  settingDescription: {
+    fontSize: 13,
+    color: '#6b7280',
   },
   actions: {
     alignItems: 'flex-start',
-    gap: 6,
+    gap: 8,
+    marginBottom: 24,
   },
-  saveButton: {
-    backgroundColor: '#2563EB',
-    color: '#FFFFFF',
-    paddingVertical: 14,
-    paddingHorizontal: 28,
-    borderRadius: 14,
+  primaryButton: {
+    backgroundColor: '#111827',
+    color: '#fff',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 18,
     fontSize: 16,
     fontWeight: '700',
     overflow: 'hidden',
   },
-  saveButtonDisabled: {
-    backgroundColor: '#93C5FD',
+  primaryButtonDisabled: {
+    opacity: 0.65,
+  },
+  helper: {
+    fontSize: 12,
+    color: '#6b7280',
   },
 });
