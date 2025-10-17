@@ -1,10 +1,10 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { useClipboardHistory } from '@/context/clipboard-history-context';
 import { copyTextToClipboard } from '@/lib/clipboard/monitor';
+import { GradientContainer } from '@/components/ui/gradient-container';
 
 export default function ModalScreen() {
   const router = useRouter();
@@ -18,7 +18,7 @@ export default function ModalScreen() {
 
   if (!entry) {
     return (
-      <LinearGradient colors={[ '#0f172a', '#1d4ed8' ]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.emptyState}>
+      <GradientContainer colors={['#1d4ed8']} style={styles.emptyState}>
         <Text style={styles.emptyTitle}>Ready to pair?</Text>
         <Text style={styles.emptySubtitle}>
           Ask your Mac to show the pairing QR code, then tap the button below. We’ll reconnect you instantly.
@@ -31,7 +31,7 @@ export default function ModalScreen() {
         <Text style={styles.heroLink} onPress={() => router.back()}>
           Return to devices
         </Text>
-      </LinearGradient>
+      </GradientContainer>
     );
   }
 

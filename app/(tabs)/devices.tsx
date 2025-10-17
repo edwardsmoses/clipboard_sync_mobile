@@ -45,7 +45,7 @@ export default function DevicesScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <GradientContainer colors={['#111827', '#1e3a8a']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+        <GradientContainer colors={['#1e3a8a']} style={styles.hero}>
           <Text style={styles.heroOverline}>Quick pairing</Text>
           <Text style={styles.heroTitle}>Bring your Mac nearby</Text>
           <Text style={styles.heroSubtitle}>

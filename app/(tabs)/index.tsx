@@ -1,6 +1,5 @@
 import * as Haptics from 'expo-haptics';
 import { FlashList } from '@shopify/flash-list';
-import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
@@ -35,7 +34,7 @@ export default function HistoryScreen() {
 
   return (
     <SafeAreaView style={[styles.container, colorScheme === 'dark' && styles.containerDark]}>
-      <GradientContainer colors={['#111827', '#1d4ed8']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+      <GradientContainer colors={['#1d4ed8']} style={styles.hero}>
         <Text style={styles.heroTitle}>Clipboard vault</Text>
         <Text style={styles.heroSubtitle}>Your snippets travel with you. Tap to reuse instantly.</Text>
         <View style={styles.heroRow}>

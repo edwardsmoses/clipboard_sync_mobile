@@ -58,7 +58,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <GradientContainer colors={['#1e2a78', '#274198', '#2e54c3']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+        <GradientContainer colors={['#274198']} style={styles.hero}>
           <Text style={styles.heroTitle}>Stay in sync</Text>
           <Text style={styles.heroSubtitle}>Make sure both devices share the same network to pair instantly.</Text>
           <View style={styles.heroPill}>
