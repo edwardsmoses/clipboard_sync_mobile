@@ -49,7 +49,7 @@ export default function DevicesScreen() {
           <Text style={styles.heroOverline}>Quick pairing</Text>
           <Text style={styles.heroTitle}>Bring your Mac nearby</Text>
           <Text style={styles.heroSubtitle}>
-            Make sure both devices are awake and connected to the same Wi‑Fi network. Your Mac will show a QR code when it’s ready.
+            Make sure both devices are awake and connected to the same Wi‑Fi network. Your Mac will show a one-time code when it’s ready.
           </Text>
           <View style={styles.heroTag}>
             <Text style={styles.heroTagText}>{networkBadge}</Text>
@@ -57,9 +57,9 @@ export default function DevicesScreen() {
           <View style={styles.heroSteps}>
             <Step index={1} label="Open the macOS companion" />
             <Step index={2} label="Tap Pair new device" />
-            <Step index={3} label="Scan the code from your phone" />
+            <Step index={3} label="Enter the code shown on your Mac" />
           </View>
-          <Pressable style={styles.heroButton} onPress={() => router.push('/modal')}>
+          <Pressable style={styles.heroButton} onPress={() => router.push('/pair')}>
             <Text style={styles.heroButtonText}>Pair a device</Text>
           </Pressable>
         </GradientContainer>

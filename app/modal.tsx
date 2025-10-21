@@ -20,13 +20,11 @@ export default function ModalScreen() {
     return (
       <GradientContainer colors={['#1d4ed8']} style={styles.emptyState}>
         <Text style={styles.emptyTitle}>Ready to pair?</Text>
-        <Text style={styles.emptySubtitle}>
-          Ask your Mac to show the pairing QR code, then tap the button below. We’ll reconnect you instantly.
-        </Text>
+        <Text style={styles.emptySubtitle}>Ask your Mac to show the pairing code, then tap the button below. We’ll reconnect you instantly.</Text>
         <View style={styles.steps}>
           <Text style={styles.stepText}>• Open clipboard sync on macOS</Text>
           <Text style={styles.stepText}>• Choose “Pair new device”</Text>
-          <Text style={styles.stepText}>• Scan the QR with this phone</Text>
+          <Text style={styles.stepText}>• Enter the code on this phone</Text>
         </View>
         <Text style={styles.heroLink} onPress={() => router.back()}>
           Return to devices
