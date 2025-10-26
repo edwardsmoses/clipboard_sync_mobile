@@ -11,7 +11,6 @@ import {
   Text,
   TextInput,
   View,
-  useColorScheme,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -19,14 +18,16 @@ import { useClipboardHistory } from "@/context/clipboard-history-context";
 import { copyTextToClipboard } from "@/lib/clipboard/monitor";
 import { GradientContainer } from "@/components/ui/gradient-container";
 import type { ClipboardEntry } from "@/lib/models/clipboard";
+import { useSettings } from "@/context/settings-context";
 
 export default function HistoryScreen() {
   const router = useRouter();
   const { entries, isReady, syncState, refresh, togglePin, remove, clearAll } =
     useClipboardHistory();
+  const { settings } = useSettings();
   const [query, setQuery] = useState("");
   const [isRefreshing, setRefreshing] = useState(false);
-  const colorScheme = useColorScheme();
+  const isPaired = Boolean(settings.endpoint);
 
   const filteredEntries = useMemo<ClipboardEntry[]>(() => {
     if (!query.trim()) {
@@ -68,6 +69,12 @@ export default function HistoryScreen() {
             <Text style={styles.heroChipText}>{entries.length} saved</Text>
           </View>
         </View>
+        {!isPaired && (
+          <Pressable style={styles.pairCta} onPress={() => router.push("/pair")}>
+            <MaterialIcons name="phonelink" size={16} color="#0f172a" />
+            <Text style={styles.pairCtaText}>Pair a device</Text>
+          </Pressable>
+        )}
         <View style={styles.searchBar}>
           <MaterialIcons name="search" size={20} color="rgba(15,23,42,0.55)" />
           <TextInput
@@ -140,10 +147,13 @@ export default function HistoryScreen() {
           isReady ? (
             <View style={[styles.emptyState, {}]}>
               <MaterialIcons name="inbox" size={40} color="#94a3b8" />
-              <Text style={styles.emptyTitle}>Waiting for your first copy</Text>
+              <Text style={styles.emptyTitle}>
+                {isPaired ? 'Waiting for your first copy' : 'Pair to get started'}
+              </Text>
               <Text style={styles.emptySubtitle}>
-                Copy anything on your phone or Mac and it will appear here with
-                a satisfying glow.
+                {isPaired
+                  ? 'Copy anything on your phone or Mac and it will appear here.'
+                  : 'Pair this phone with your Mac to start syncing. Tap “Pair a device” above.'}
               </Text>
             </View>
           ) : (
@@ -302,6 +312,21 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 13,
   },
+  pairCta: {
+    marginTop: 8,
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "#f9fafb",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 999,
+  },
+  pairCtaText: {
+    color: "#0f172a",
+    fontWeight: "700",
+  },
   heroChip: {
     flexDirection: "row",
     alignItems: "center",
@@ -347,6 +372,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   listContent: {
+    paddingTop: 20,
     paddingHorizontal: 20,
     paddingBottom: 120,
     backgroundColor: "#eef2ff",

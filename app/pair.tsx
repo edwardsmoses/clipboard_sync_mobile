@@ -49,6 +49,10 @@ export default function PairScreen() {
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
         <GradientContainer colors={['#1d4ed8']} style={styles.hero}>
+          <Pressable style={styles.backButton} onPress={() => router.back()}>
+            <MaterialIcons name="arrow-back-ios" size={18} color="#dbeafe" />
+            <Text style={styles.backButtonText}>Back</Text>
+          </Pressable>
           <MaterialIcons name="phonelink" size={36} color="#dbeafe" />
           <Text style={styles.heroTitle}>Pair this phone</Text>
           <Text style={styles.heroSubtitle}>
@@ -115,6 +119,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 22,
     elevation: 8,
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 4,
+  },
+  backButtonText: {
+    color: '#dbeafe',
+    fontWeight: '600',
   },
   heroTitle: {
     color: '#fff',
