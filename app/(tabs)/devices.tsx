@@ -18,6 +18,7 @@ export default function DevicesScreen() {
   const { entries, device, syncState } = useClipboardHistory();
   const { settings } = useSettings();
   const network = useNetworkSummary(6000);
+  const isConnected = syncState === 'connected';
 
   const connectedDevices = useMemo(() => {
     const map = new Map<string, { name: string; lastSeen: number }>();
@@ -45,23 +46,41 @@ export default function DevicesScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <GradientContainer colors={['#1e3a8a']} style={styles.hero}>
-          <Text style={styles.heroOverline}>Quick pairing</Text>
-          <Text style={styles.heroTitle}>Bring your Mac nearby</Text>
-          <Text style={styles.heroSubtitle}>
-            Make sure both devices are awake and connected to the same Wi‑Fi network. Your Mac will show a one-time code when it’s ready.
-          </Text>
-          <View style={styles.heroTag}>
-            <Text style={styles.heroTagText}>{networkBadge}</Text>
-          </View>
-          <View style={styles.heroSteps}>
-            <Step index={1} label="Open the macOS companion" />
-            <Step index={2} label="Tap Pair new device" />
-            <Step index={3} label="Enter the code shown on your Mac" />
-          </View>
-          <Pressable style={styles.heroButton} onPress={() => router.push('/pair')}>
-            <Text style={styles.heroButtonText}>Pair a device</Text>
-          </Pressable>
+        <GradientContainer colors={[isConnected ? '#065f46' : '#1e3a8a']} style={styles.hero}>
+          {isConnected ? (
+            <>
+              <Text style={styles.heroOverline}>Status</Text>
+              <Text style={styles.heroTitle}>Paired successfully</Text>
+              <Text style={styles.heroSubtitle}>
+                Copy on either device to sync instantly. Keep both on the same Wi‑Fi for best results.
+              </Text>
+              <View style={styles.heroTag}>
+                <Text style={styles.heroTagText}>{networkBadge}</Text>
+              </View>
+              <Pressable style={styles.heroButton} onPress={() => router.push('/(tabs)/settings')}>
+                <Text style={styles.heroButtonText}>Manage pairing</Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              <Text style={styles.heroOverline}>Quick pairing</Text>
+              <Text style={styles.heroTitle}>Bring your Mac nearby</Text>
+              <Text style={styles.heroSubtitle}>
+                Make sure both devices are awake and connected to the same Wi‑Fi network. Your Mac will show a one-time code when it’s ready.
+              </Text>
+              <View style={styles.heroTag}>
+                <Text style={styles.heroTagText}>{networkBadge}</Text>
+              </View>
+              <View style={styles.heroSteps}>
+                <Step index={1} label="Open the macOS companion" />
+                <Step index={2} label="Tap Pair new device" />
+                <Step index={3} label="Enter the code shown on your Mac" />
+              </View>
+              <Pressable style={styles.heroButton} onPress={() => router.push('/pair')}>
+                <Text style={styles.heroButtonText}>Pair a device</Text>
+              </Pressable>
+            </>
+          )}
         </GradientContainer>
 
         <View style={styles.surface}>
