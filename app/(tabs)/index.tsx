@@ -150,7 +150,7 @@ function HistoryListItem({ entry, onTogglePin, onDelete, onInspect }: HistoryLis
       onLongPress={onInspect}
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}>
       <View style={styles.cardHeader}>
-        <MaterialIcons name={getContentIcon(entry.contentType)} size={20} color="#2563eb" />
+        <MaterialIcons name={getContentIcon(entry.contentType)} size={16} color="#2563eb" />
         <Text style={styles.cardDevice}>{entry.deviceName}</Text>
         <Text style={styles.cardTimestamp}>{formattedTime}</Text>
       </View>
@@ -295,62 +295,61 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
     backgroundColor: '#eef2ff',
   },
-  separator: {
-    height: 16,
-  },
+  separator: { height: 12 },
   card: {
     backgroundColor: '#ffffff',
-    borderRadius: 24,
-    padding: 18,
-    gap: 12,
-    shadowColor: '#1e1f38',
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 3,
+    borderRadius: 14,
+    padding: 14,
+    gap: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#e5e7eb',
   },
   cardPressed: {
-    transform: [{ scale: 0.98 }],
+    opacity: 0.9,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   cardDevice: {
     flex: 1,
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#111827',
   },
   cardTimestamp: {
     fontSize: 12,
     color: '#9ca3af',
   },
   cardText: {
-    fontSize: 16,
-    lineHeight: 22,
-    color: '#1a1a1a',
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#1f2937',
   },
   cardFooter: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     gap: 8,
   },
   pill: {
     fontSize: 12,
     fontWeight: '600',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: '#e0e7ff',
-    color: '#1d4ed8',
+    backgroundColor: 'transparent',
+    color: '#6b7280',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#d1d5db',
   },
   pillActive: {
-    backgroundColor: '#facc15',
-    color: '#7c2d12',
+    backgroundColor: '#f3f4f6',
+    color: '#374151',
   },
   deletePill: {
-    backgroundColor: '#fee2e2',
+    backgroundColor: 'transparent',
     color: '#b91c1c',
+    borderColor: '#fecaca',
   },
   emptyState: {
     marginTop: 72,
