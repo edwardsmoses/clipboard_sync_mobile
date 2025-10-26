@@ -54,8 +54,9 @@ export default function SettingsScreen() {
     try {
       setSaving(true);
       await update({
-        endpoint: endpoint.trim() || null,
-        pairingToken: pairingToken.trim() || null,
+        // Keep existing connection details; pairing flow updates these.
+        endpoint: settings.endpoint,
+        pairingToken: settings.pairingToken,
         autoStartOnBoot,
         wifiOnly,
         discoverable,
@@ -80,30 +81,7 @@ export default function SettingsScreen() {
           </View>
         </GradientContainer>
 
-        <View style={styles.surface}>
-          <Text style={styles.sectionTitle}>Bridge connection</Text>
-          <Text style={styles.sectionBody}>
-            Paste the secure URL exposed by the macOS bridge. We autofill
-            everything else for you.
-          </Text>
-          <TextInput
-            style={styles.input}
-            placeholder="wss://mac.local:4000"
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="url"
-            value={endpoint}
-            onChangeText={setEndpoint}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Pairing token (optional)"
-            autoCapitalize="none"
-            autoCorrect={false}
-            value={pairingToken}
-            onChangeText={setPairingToken}
-          />
-        </View>
+        {/* Connection URL inputs hidden; pairing flow handles configuration. */}
 
         <View style={styles.surface}>
           <Text style={styles.sectionTitle}>Behaviour</Text>

@@ -13,7 +13,7 @@ import type { ClipboardEntry } from '@/lib/models/clipboard';
 
 export default function HistoryScreen() {
   const router = useRouter();
-  const { entries, isReady, syncState, refresh, togglePin, remove } = useClipboardHistory();
+  const { entries, isReady, syncState, refresh, togglePin, remove, clearAll } = useClipboardHistory();
   const [query, setQuery] = useState('');
   const [isRefreshing, setRefreshing] = useState(false);
   const colorScheme = useColorScheme();
@@ -60,6 +60,19 @@ export default function HistoryScreen() {
             <Text style={styles.searchBadgeText}>{filteredEntries.length}</Text>
           </View>
         </View>
+
+        <Pressable
+          onPress={() => {
+            if (entries.length === 0) return;
+            Alert.alert('Delete all history?', 'This removes all saved items on this phone.', [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Delete all', style: 'destructive', onPress: () => void clearAll() },
+            ]);
+          }}
+          style={({ pressed }) => [styles.clearAllButton, pressed && { opacity: 0.8 }]}>
+          <MaterialIcons name="delete-sweep" size={18} color="#fff" />
+          <Text style={styles.clearAllText}>Delete all</Text>
+        </Pressable>
       </GradientContainer>
 
       <FlashList<ClipboardEntry>
@@ -207,6 +220,21 @@ const styles = StyleSheet.create({
   heroRow: {
     flexDirection: 'row',
     gap: 12,
+  },
+  clearAllButton: {
+    marginTop: 10,
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#ef4444',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 999,
+  },
+  clearAllText: {
+    color: '#fff',
+    fontWeight: '700',
   },
   heroChip: {
     flexDirection: 'row',

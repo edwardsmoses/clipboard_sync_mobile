@@ -73,6 +73,7 @@ interface ContextValue {
   remove(id: string): Promise<void>;
   togglePin(id: string, isPinned: boolean): Promise<void>;
   ingestRemoteEntry(entry: ClipboardEntry): Promise<void>;
+  clearAll(): Promise<void>;
 }
 
 const ClipboardHistoryContext = createContext<ContextValue>({
@@ -84,6 +85,7 @@ const ClipboardHistoryContext = createContext<ContextValue>({
   remove: async () => undefined,
   togglePin: async () => undefined,
   ingestRemoteEntry: async () => undefined,
+  clearAll: async () => undefined,
 });
 
 interface Props {
@@ -134,6 +136,11 @@ export function ClipboardHistoryProvider({ children }: Props) {
   const ingestRemoteEntry = useCallback(async (entry: ClipboardEntry) => {
     await HistoryStore.upsertEntry(entry);
     dispatch({ type: 'UPSERT_ENTRY', entry });
+  }, []);
+
+  const clearAll = useCallback(async () => {
+    await HistoryStore.clearEntries();
+    dispatch({ type: 'SET_ENTRIES', entries: [] });
   }, []);
 
   useEffect(() => {
@@ -240,8 +247,9 @@ export function ClipboardHistoryProvider({ children }: Props) {
       remove,
       togglePin,
       ingestRemoteEntry,
+      clearAll,
     }),
-    [ingestRemoteEntry, refresh, remove, state.device, state.entries, state.isReady, state.syncState, togglePin],
+    [clearAll, ingestRemoteEntry, refresh, remove, state.device, state.entries, state.isReady, state.syncState, togglePin],
   );
 
   return <ClipboardHistoryContext.Provider value={value}>{children}</ClipboardHistoryContext.Provider>;

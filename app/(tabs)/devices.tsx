@@ -83,6 +83,18 @@ export default function DevicesScreen() {
           )}
         </GradientContainer>
 
+        {isConnected && (
+          <View style={styles.surface}>
+            <Text style={styles.sectionTitle}>Active connection</Text>
+            <View style={styles.selfCard}>
+              <Text style={styles.selfName}>Desktop bridge</Text>
+              <Text style={styles.selfMeta}>macOS companion</Text>
+              <Text style={[styles.statusChip, styles.statusChipPositive]}>Connected</Text>
+              <Text style={styles.selfStatus}>Syncs in real time</Text>
+            </View>
+          </View>
+        )}
+
         <View style={styles.surface}>
           <Text style={styles.sectionTitle}>This phone</Text>
           <View style={styles.selfCard}>
