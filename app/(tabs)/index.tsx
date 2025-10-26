@@ -3,7 +3,7 @@ import { FlashList } from '@shopify/flash-list';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { Pressable, RefreshControl, StyleSheet, Text, TextInput, View, useColorScheme } from 'react-native';
+import { Alert, Pressable, RefreshControl, StyleSheet, Text, TextInput, View, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useClipboardHistory } from '@/context/clipboard-history-context';
@@ -66,11 +66,20 @@ export default function HistoryScreen() {
             if (entries.length === 0) return;
             Alert.alert('Delete all history?', 'This removes all saved items on this phone.', [
               { text: 'Cancel', style: 'cancel' },
-              { text: 'Delete all', style: 'destructive', onPress: () => void clearAll() },
+              {
+                text: 'Delete all',
+                style: 'destructive',
+                onPress: () => {
+                  void (async () => {
+                    await clearAll();
+                    await refresh();
+                  })();
+                },
+              },
             ]);
           }}
-          style={({ pressed }) => [styles.clearAllButton, pressed && { opacity: 0.8 }]}>
-          <MaterialIcons name="delete-sweep" size={18} color="#fff" />
+          style={({ pressed }) => [styles.clearAllButton, pressed && { opacity: 0.7 }]}>
+          <MaterialIcons name="delete-sweep" size={16} color="rgba(255,255,255,0.85)" />
           <Text style={styles.clearAllText}>Delete all</Text>
         </Pressable>
       </GradientContainer>
@@ -222,19 +231,20 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   clearAllButton: {
-    marginTop: 10,
-    alignSelf: 'flex-start',
+    marginTop: 8,
+    alignSelf: 'flex-end',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#ef4444',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    gap: 6,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 6,
+    paddingVertical: 4,
     borderRadius: 999,
   },
   clearAllText: {
-    color: '#fff',
-    fontWeight: '700',
+    color: 'rgba(255,255,255,0.85)',
+    fontWeight: '600',
+    fontSize: 13,
   },
   heroChip: {
     flexDirection: 'row',

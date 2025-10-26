@@ -15,6 +15,7 @@ export interface SyncClientOptions {
   discoverable: boolean;
   onClipboardEvent?: (event: RemoteClipboardEvent) => void;
   onConnectionChange?: (state: SyncConnectionState) => void;
+  onServerInfo?: (info: { serverName?: string; clients?: Array<{ id: string; deviceName?: string }> }) => void;
 }
 
 export type SyncConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
@@ -73,6 +74,9 @@ export class SyncClient {
         const envelope = JSON.parse(event.data) as SyncEnvelope;
         if (envelope.type === 'clipboard-event' && this.options.onClipboardEvent) {
           this.options.onClipboardEvent(envelope.payload as RemoteClipboardEvent);
+        } else if (envelope.type === 'ack' && this.options.onServerInfo) {
+          const payload = envelope.payload as { serverName?: string; clients?: Array<{ id: string; deviceName?: string }> };
+          this.options.onServerInfo(payload);
         }
       } catch (error) {
         console.warn('[sync] Failed to decode message', error);

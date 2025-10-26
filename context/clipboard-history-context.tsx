@@ -24,13 +24,15 @@ type Action =
   | { type: 'REMOVE_ENTRY'; id: string }
   | { type: 'SET_READY'; isReady: boolean }
   | { type: 'SET_DEVICE'; device: DeviceIdentity }
-  | { type: 'SET_SYNC_STATE'; state: SyncConnectionState };
+  | { type: 'SET_SYNC_STATE'; state: SyncConnectionState }
+  | { type: 'SET_SERVER_NAME'; name: string | null };
 
 interface ClipboardHistoryState {
   entries: ClipboardEntry[];
   isReady: boolean;
   device: DeviceIdentity | null;
   syncState: SyncConnectionState;
+  serverName: string | null;
 }
 
 const initialState: ClipboardHistoryState = {
@@ -38,6 +40,7 @@ const initialState: ClipboardHistoryState = {
   isReady: false,
   device: null,
   syncState: 'disconnected',
+  serverName: null,
 };
 
 function reducer(state: ClipboardHistoryState, action: Action): ClipboardHistoryState {
@@ -59,6 +62,8 @@ function reducer(state: ClipboardHistoryState, action: Action): ClipboardHistory
       return { ...state, device: action.device };
     case 'SET_SYNC_STATE':
       return { ...state, syncState: action.state };
+    case 'SET_SERVER_NAME':
+      return { ...state, serverName: action.name };
     default:
       return state;
   }
@@ -69,6 +74,7 @@ interface ContextValue {
   isReady: boolean;
   device: DeviceIdentity | null;
   syncState: SyncConnectionState;
+  serverName: string | null;
   refresh(): Promise<void>;
   remove(id: string): Promise<void>;
   togglePin(id: string, isPinned: boolean): Promise<void>;
@@ -81,6 +87,7 @@ const ClipboardHistoryContext = createContext<ContextValue>({
   isReady: false,
   device: null,
   syncState: 'disconnected',
+  serverName: null,
   refresh: async () => undefined,
   remove: async () => undefined,
   togglePin: async () => undefined,
@@ -212,6 +219,7 @@ export function ClipboardHistoryProvider({ children }: Props) {
         discoverable: settings.discoverable,
         onConnectionChange: (syncState: SyncConnectionState) =>
           dispatch({ type: 'SET_SYNC_STATE', state: syncState }),
+        onServerInfo: (info) => dispatch({ type: 'SET_SERVER_NAME', name: info.serverName ?? null }),
         onClipboardEvent: (event: RemoteClipboardEvent) => {
           if (event.eventType === 'added') {
             void ingestRemoteEntry(event.payload);
@@ -243,13 +251,14 @@ export function ClipboardHistoryProvider({ children }: Props) {
       isReady: state.isReady,
       device: state.device,
       syncState: state.syncState,
+      serverName: state.serverName,
       refresh,
       remove,
       togglePin,
       ingestRemoteEntry,
       clearAll,
     }),
-    [clearAll, ingestRemoteEntry, refresh, remove, state.device, state.entries, state.isReady, state.syncState, togglePin],
+    [clearAll, ingestRemoteEntry, refresh, remove, state.device, state.entries, state.isReady, state.serverName, state.syncState, togglePin],
   );
 
   return <ClipboardHistoryContext.Provider value={value}>{children}</ClipboardHistoryContext.Provider>;

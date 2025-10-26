@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useClipboardHistory } from '@/context/clipboard-history-context';
@@ -15,10 +15,11 @@ function formatTimestamp(timestamp: number) {
 
 export default function DevicesScreen() {
   const router = useRouter();
-  const { entries, device, syncState } = useClipboardHistory();
-  const { settings } = useSettings();
+  const { entries, device, syncState, serverName } = useClipboardHistory();
+  const { settings, update } = useSettings();
   const network = useNetworkSummary(6000);
   const isConnected = syncState === 'connected';
+  const isPaired = Boolean(settings.endpoint);
 
   const connectedDevices = useMemo(() => {
     const map = new Map<string, { name: string; lastSeen: number }>();
@@ -46,8 +47,8 @@ export default function DevicesScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <GradientContainer colors={[isConnected ? '#065f46' : '#1e3a8a']} style={styles.hero}>
-          {isConnected ? (
+        <GradientContainer colors={[(isPaired ? '#065f46' : '#1e3a8a')]} style={styles.hero}>
+          {isPaired ? (
             <>
               <Text style={styles.heroOverline}>Status</Text>
               <Text style={styles.heroTitle}>Paired successfully</Text>
@@ -55,10 +56,21 @@ export default function DevicesScreen() {
                 Copy on either device to sync instantly. Keep both on the same Wi‑Fi for best results.
               </Text>
               <View style={styles.heroTag}>
-                <Text style={styles.heroTagText}>{networkBadge}</Text>
+                <Text style={styles.heroTagText}>{isConnected ? 'Connected' : 'Connecting…'} · {networkBadge}</Text>
               </View>
-              <Pressable style={styles.heroButton} onPress={() => router.push('/(tabs)/settings')}>
-                <Text style={styles.heroButtonText}>Manage pairing</Text>
+              <Pressable
+                style={[styles.heroButton, { backgroundColor: '#fee2e2' }]}
+                onPress={() => {
+                  Alert.alert('Forget pairing?', 'This will disconnect from the desktop bridge.', [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Forget',
+                      style: 'destructive',
+                      onPress: () => void update({ endpoint: null, pairingToken: null }),
+                    },
+                  ]);
+                }}>
+                <Text style={[styles.heroButtonText, { color: '#991b1b' }]}>Forget pairing</Text>
               </Pressable>
             </>
           ) : (
@@ -83,13 +95,15 @@ export default function DevicesScreen() {
           )}
         </GradientContainer>
 
-        {isConnected && (
+        {isPaired && (
           <View style={styles.surface}>
             <Text style={styles.sectionTitle}>Active connection</Text>
             <View style={styles.selfCard}>
-              <Text style={styles.selfName}>Desktop bridge</Text>
+              <Text style={styles.selfName}>{serverName ?? 'Desktop bridge'}</Text>
               <Text style={styles.selfMeta}>macOS companion</Text>
-              <Text style={[styles.statusChip, styles.statusChipPositive]}>Connected</Text>
+              <Text style={[styles.statusChip, isConnected ? styles.statusChipPositive : styles.statusChipMuted]}>
+                {isConnected ? 'Connected' : 'Connecting…'}
+              </Text>
               <Text style={styles.selfStatus}>Syncs in real time</Text>
             </View>
           </View>
@@ -108,6 +122,17 @@ export default function DevicesScreen() {
         </View>
 
         <View style={styles.surface}>
+          <Text style={styles.sectionTitle}>Settings</Text>
+          <View style={styles.settingRow}>
+            <View style={styles.settingCopy}>
+              <Text style={styles.settingTitle}>Make this device discoverable</Text>
+              <Text style={styles.settingDescription}>Allow new pair requests from your Mac.</Text>
+            </View>
+            <Switch value={settings.discoverable} onValueChange={(v) => void update({ discoverable: v })} />
+          </View>
+        </View>
+
+        <View style={styles.surface}>
           <Text style={styles.sectionTitle}>Recently seen devices</Text>
           {connectedDevices.length === 0 ? (
             <Text style={styles.emptyCopy}>No history yet. Pair with your Mac to see it here.</Text>
@@ -121,6 +146,13 @@ export default function DevicesScreen() {
               </View>
             ))
           )}
+        </View>
+
+        <View style={styles.surface}>
+          <Text style={styles.sectionTitle}>About</Text>
+          <Text style={styles.aboutTitle}>ClipBridge</Text>
+          <Text style={styles.aboutSubtitle}>Built by Edwards Moses</Text>
+          <Text style={styles.aboutLink}>edwardsmoses.com</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -270,10 +302,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#e0e7ff',
     color: '#4338ca',
   },
+  settingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 16,
+  },
+  settingCopy: { flex: 1, gap: 4 },
+  settingTitle: { fontSize: 15, fontWeight: '600', color: '#1f2937' },
+  settingDescription: { fontSize: 13, color: '#6b7280' },
   emptyCopy: {
     fontSize: 14,
     color: '#6b7280',
   },
+  aboutTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
+  aboutSubtitle: { fontSize: 14, color: '#6b7280' },
+  aboutLink: { fontSize: 14, color: '#2563eb', fontWeight: '600' },
   deviceRow: {
     paddingVertical: 14,
     borderBottomColor: '#e5e7eb',

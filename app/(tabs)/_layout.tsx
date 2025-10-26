@@ -30,13 +30,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={26} name="ipad.and.iphone" color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color }) => <IconSymbol size={26} name="gearshape.fill" color={color} />,
-        }}
-      />
+      {null}
     </Tabs>
   );
 }
