@@ -92,37 +92,39 @@ export async function upsertEntry(entry: ClipboardEntry): Promise<void> {
       created_at, updated_at, device_id, device_name, origin, is_pinned,
       sync_state, synced_at, metadata
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-    entry.id,
-    entry.contentType,
-    entry.text ?? null,
-    entry.html ?? null,
-    entry.imageUri ?? null,
-    entry.fileUri ?? null,
-    entry.appPackage ?? null,
-    entry.createdAt,
-    entry.updatedAt,
-    entry.deviceId,
-    entry.deviceName,
-    entry.origin,
-    entry.isPinned ? 1 : 0,
-    entry.syncState,
-    entry.syncedAt ?? null,
-    entry.metadata ? JSON.stringify(entry.metadata) : null,
+    [
+      entry.id,
+      entry.contentType,
+      entry.text ?? null,
+      entry.html ?? null,
+      entry.imageUri ?? null,
+      entry.fileUri ?? null,
+      entry.appPackage ?? null,
+      entry.createdAt,
+      entry.updatedAt,
+      entry.deviceId,
+      entry.deviceName,
+      entry.origin,
+      entry.isPinned ? 1 : 0,
+      entry.syncState,
+      entry.syncedAt ?? null,
+      entry.metadata ? JSON.stringify(entry.metadata) : null,
+    ],
   );
 }
 
 export async function getEntries(limit = 500): Promise<ClipboardEntry[]> {
   const db = await getDatabase();
-  const rows = (await (db as any).getAllAsync(
+  const rows = (await db.getAllAsync(
     `SELECT * FROM clipboard_entries ORDER BY created_at DESC LIMIT ?;`,
-    limit,
+    [limit],
   )) as HistoryRow[];
   return rows.map(mapRow);
 }
 
 export async function deleteEntry(id: string): Promise<void> {
   const db = await getDatabase();
-  await db.runAsync(`DELETE FROM clipboard_entries WHERE id = ?;`, id);
+  await db.runAsync(`DELETE FROM clipboard_entries WHERE id = ?;`, [id]);
 }
 
 export async function clearEntries(): Promise<void> {
@@ -132,16 +134,18 @@ export async function clearEntries(): Promise<void> {
 
 export async function updatePinned(id: string, isPinned: boolean): Promise<void> {
   const db = await getDatabase();
-  await db.runAsync(`UPDATE clipboard_entries SET is_pinned = ? WHERE id = ?;`, isPinned ? 1 : 0, id);
+  await db.runAsync(`UPDATE clipboard_entries SET is_pinned = ? WHERE id = ?;`, [isPinned ? 1 : 0, id]);
 }
 
 export async function updateSyncState(id: string, syncState: ClipboardSyncState, syncedAt: number | null) {
   const db = await getDatabase();
   await db.runAsync(
     `UPDATE clipboard_entries SET sync_state = ?, synced_at = ?, updated_at = ? WHERE id = ?;`,
-    syncState,
-    syncedAt,
-    Date.now(),
-    id,
+    [
+      syncState,
+      syncedAt,
+      Date.now(),
+      id,
+    ],
   );
 }
