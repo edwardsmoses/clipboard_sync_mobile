@@ -148,11 +148,9 @@ export default function DevicesScreen() {
           )}
         </View>
 
-        <View style={styles.surface}>
-          <Text style={styles.sectionTitle}>About</Text>
+        <View style={styles.aboutSection}>
           <Text style={styles.aboutTitle}>ClipBridge</Text>
-          <Text style={styles.aboutSubtitle}>Built by Edwards Moses</Text>
-          <Text style={styles.aboutLink}>edwardsmoses.com</Text>
+          <Text style={styles.aboutSubtitle}>Built by Edwards Moses · edwardsmoses.com</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -315,9 +313,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6b7280',
   },
-  aboutTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  aboutSubtitle: { fontSize: 14, color: '#6b7280' },
-  aboutLink: { fontSize: 14, color: '#2563eb', fontWeight: '600' },
+  aboutSection: { gap: 4, paddingHorizontal: 4 },
+  aboutTitle: { fontSize: 16, fontWeight: '700', color: '#1f2937' },
+  aboutSubtitle: { fontSize: 13, color: '#6b7280' },
   deviceRow: {
     paddingVertical: 14,
     borderBottomColor: '#e5e7eb',

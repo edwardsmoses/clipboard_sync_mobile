@@ -15,13 +15,6 @@ npm install
 npx expo start --android
 ```
 
-The Android client now includes:
-
-- A gradient-fed timeline with quick filters, material icons, and haptic copy-back actions.
-- A Devices hub that guides pairing, shows Wi‑Fi status, and lists recently seen companions.
-- A Settings panel inspired by Contra’s glossy UI, complete with network diagnostics and a discoverability toggle.
-- Background clipboard monitoring that persists entries to SQLite and emits them to the sync layer.
-
 ## Getting started (macOS)
 
 Open `clipboard_sync_desktop/clipboard_sync_desktop.xcodeproj` in Xcode 16 and run the `clipboard_sync_desktop` target. The desktop app ships with:
