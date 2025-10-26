@@ -36,7 +36,7 @@ export default function PairScreen() {
       setSubmitting(true);
       await update({ endpoint: result.endpoint, pairingToken: null });
       Alert.alert('Connected', 'Your phone is now paired with the desktop bridge.', [
-        { text: 'Done', onPress: () => router.back() },
+        { text: 'Done', onPress: () => router.replace('/(tabs)/devices') },
       ]);
     } catch (error) {
       Alert.alert('Unable to save', (error as Error).message);
