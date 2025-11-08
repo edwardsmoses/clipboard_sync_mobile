@@ -83,12 +83,26 @@ export class SyncClient {
       }
     };
 
-    this.socket.onerror = (error) => {
-      console.warn('[sync] WebSocket error', error);
+    this.socket.onerror = (error: any) => {
+      // In RN, the error event often hides the message in `event.message`.
+      const msg = typeof error?.message === 'string' ? error.message : (() => {
+        try {
+          return JSON.stringify(error);
+        } catch {
+          return String(error);
+        }
+      })();
+      console.warn('[sync] WebSocket error', msg);
       this.updateState('error');
     };
 
-    this.socket.onclose = () => {
+    this.socket.onclose = (evt: any) => {
+      try {
+        const code = evt?.code;
+        const reason = evt?.reason;
+        const wasClean = evt?.wasClean;
+        console.warn('[sync] WebSocket closed', { code, reason, wasClean });
+      } catch {}
       this.stopHeartbeat();
       this.updateState('disconnected');
       this.scheduleReconnect();

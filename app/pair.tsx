@@ -54,7 +54,7 @@ export default function PairScreen() {
             <Text style={styles.backButtonText}>Back</Text>
           </Pressable>
           <MaterialIcons name="phonelink" size={36} color="#dbeafe" />
-          <Text style={styles.heroTitle}>Pair this phone</Text>
+          <Text style={styles.heroTitle}>Pair this phone with your Mac</Text>
           <Text style={styles.heroSubtitle}>
             Enter the one-time code shown on your Mac. We&apos;ll set up the secure connection instantly.
           </Text>
