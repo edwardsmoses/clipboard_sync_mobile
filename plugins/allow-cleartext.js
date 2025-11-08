@@ -2,19 +2,19 @@
 // - Sets android:usesCleartextTraffic and android:networkSecurityConfig on the Application
 // - Writes res/xml/network_security_config.xml with cleartextTrafficPermitted="true"
 
-const { withAndroidManifest } = require('@expo/config-plugins');
+const { withAndroidManifest, withDangerousMod, AndroidConfig } = require('@expo/config-plugins');
 const fs = require('fs');
 const path = require('path');
 
 /** @type {import('@expo/config-plugins').ConfigPlugin} */
 module.exports = function withAllowCleartext(config) {
   config = withAndroidManifest(config, (config) => {
-    const manifest = config.modResults.manifest;
+    const androidManifest = config.modResults; // Parsed AndroidManifest.xml
     // Ensure tools namespace for tools:replace
-    if (!manifest.$) manifest.$ = {};
-    manifest.$['xmlns:tools'] = manifest.$['xmlns:tools'] || 'http://schemas.android.com/tools';
+    if (!androidManifest.manifest.$) androidManifest.manifest.$ = {};
+    androidManifest.manifest.$['xmlns:tools'] = androidManifest.manifest.$['xmlns:tools'] || 'http://schemas.android.com/tools';
 
-    const app = getMainApplication(manifest);
+    const app = AndroidConfig.Manifest.getMainApplicationOrThrow(androidManifest);
     if (!app.$) app.$ = {};
 
     // Set attributes
@@ -33,33 +33,20 @@ module.exports = function withAllowCleartext(config) {
   });
 
   // Write res/xml/network_security_config.xml after prebuild generated native project
-  config = withDangerousAndroidWrite(config, () => {
-    const androidRoot = config.modRequest.platformProjectRoot;
-    const xmlDir = path.join(androidRoot, 'app', 'src', 'main', 'res', 'xml');
-    const xmlPath = path.join(xmlDir, 'network_security_config.xml');
-    fs.mkdirSync(xmlDir, { recursive: true });
-    const xml = `<?xml version="1.0" encoding="utf-8"?>\n<network-security-config>\n    <base-config cleartextTrafficPermitted="true" />\n</network-security-config>\n`;
-    fs.writeFileSync(xmlPath, xml);
-  });
+  config = withDangerousMod(config, [
+    'android',
+    (cfg) => {
+      const androidRoot = cfg.modRequest.platformProjectRoot;
+      const xmlDir = path.join(androidRoot, 'app', 'src', 'main', 'res', 'xml');
+      const xmlPath = path.join(xmlDir, 'network_security_config.xml');
+      fs.mkdirSync(xmlDir, { recursive: true });
+      const xml = `<?xml version="1.0" encoding="utf-8"?>\n<network-security-config>\n    <base-config cleartextTrafficPermitted=\"true\" />\n</network-security-config>\n`;
+      fs.writeFileSync(xmlPath, xml);
+      return cfg;
+    },
+  ]);
 
   return config;
 };
 
-function getMainApplication(manifest) {
-  const app = manifest.application && manifest.application[0];
-  if (!app) {
-    throw new Error('Android manifest is missing <application>');
-  }
-  return app;
-}
-
-function withDangerousAndroidWrite(config, action) {
-  return require('@expo/config-plugins').withDangerousMod(config, [
-    'android',
-    (cfg) => {
-      action(cfg);
-      return cfg;
-    },
-  ]);
-}
-
+// no-op helper kept for backwards compatibility if needed
