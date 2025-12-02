@@ -1,3 +1,5 @@
+import Constants from 'expo-constants';
+import * as Updates from 'expo-updates';
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
@@ -20,6 +22,8 @@ export default function DevicesScreen() {
   const network = useNetworkSummary(6000);
   const isConnected = syncState === 'connected';
   const isPaired = Boolean(settings.endpoint);
+  const appVersion = Constants.expoConfig?.version ?? Constants.nativeAppVersion ?? 'dev';
+  const updateFingerprint = Updates.updateId ?? Updates.manifest?.id ?? null;
 
   const connectedDevices = useMemo(() => {
     const map = new Map<string, { name: string; lastSeen: number }>();
@@ -149,8 +153,14 @@ export default function DevicesScreen() {
         </View>
 
         <View style={styles.aboutSection}>
-          <Text style={styles.aboutTitle}>ClipBridge</Text>
+          <View style={styles.aboutHeader}>
+            <Text style={styles.aboutTitle}>ClipBridge</Text>
+            <Text style={styles.versionBadge}>v{appVersion}</Text>
+          </View>
           <Text style={styles.aboutSubtitle}>Built by Edwards Moses · edwardsmoses.com</Text>
+          {updateFingerprint ? (
+            <Text style={styles.aboutCaption}>Update fingerprint: {updateFingerprint}</Text>
+          ) : null}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -314,8 +324,19 @@ const styles = StyleSheet.create({
     color: '#6b7280',
   },
   aboutSection: { gap: 4, paddingHorizontal: 4 },
+  aboutHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   aboutTitle: { fontSize: 16, fontWeight: '700', color: '#1f2937' },
+  versionBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    backgroundColor: '#eef2ff',
+    color: '#4338ca',
+    fontSize: 12,
+    fontWeight: '700',
+  },
   aboutSubtitle: { fontSize: 13, color: '#6b7280' },
+  aboutCaption: { fontSize: 12, color: '#9ca3af' },
   deviceRow: {
     paddingVertical: 14,
     borderBottomColor: '#e5e7eb',
