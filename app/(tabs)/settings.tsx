@@ -1,13 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Alert, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useSettings } from "@/context/settings-context";
@@ -16,8 +8,6 @@ import { GradientContainer } from "@/components/ui/gradient-container";
 
 export default function SettingsScreen() {
   const { settings, update, isReady } = useSettings();
-  const [endpoint, setEndpoint] = useState(settings.endpoint ?? "");
-  const [pairingToken, setPairingToken] = useState(settings.pairingToken ?? "");
   const [autoStartOnBoot, setAutoStartOnBoot] = useState(
     settings.autoStartOnBoot
   );
@@ -28,8 +18,6 @@ export default function SettingsScreen() {
   const network = useNetworkSummary();
 
   useEffect(() => {
-    setEndpoint(settings.endpoint ?? "");
-    setPairingToken(settings.pairingToken ?? "");
     setAutoStartOnBoot(settings.autoStartOnBoot);
     setWifiOnly(settings.wifiOnly);
     setDiscoverable(settings.discoverable);
@@ -54,9 +42,6 @@ export default function SettingsScreen() {
     try {
       setSaving(true);
       await update({
-        // Keep existing connection details; pairing flow updates these.
-        endpoint: settings.endpoint,
-        pairingToken: settings.pairingToken,
         autoStartOnBoot,
         wifiOnly,
         discoverable,
@@ -74,7 +59,7 @@ export default function SettingsScreen() {
         <GradientContainer colors={["#274198"]} style={styles.hero}>
           <Text style={styles.heroTitle}>Stay in sync</Text>
           <Text style={styles.heroSubtitle}>
-            Make sure both devices share the same network to pair instantly.
+            ClipBridge uses a secure relay, so pairing works over any internet connection.
           </Text>
           <View style={styles.heroPill}>
             <Text style={styles.heroPillText}>{networkStatusLabel}</Text>

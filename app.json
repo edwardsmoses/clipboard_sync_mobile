@@ -20,7 +20,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.edwards.clipboard_bridge",
-      "usesCleartextTraffic": true
+      "usesCleartextTraffic": false
     },
     "web": {
       "output": "static",
@@ -39,8 +39,7 @@
             "backgroundColor": "#ffffff"
           }
         }
-      ],
-      "./plugins/allow-cleartext"
+      ]
     ],
     "splash": {
       "image": "./app_icon.png",
@@ -53,6 +52,10 @@
     },
     "extra": {
       "router": {},
+      "relay": {
+        "apiBaseUrl": "https://bridge.edwardsmoses.com",
+        "websocketUrl": "wss://bridge.edwardsmoses.com/connect"
+      },
       "eas": {
         "projectId": "6ac9e934-7fd1-4fc7-a125-567f52883401"
       }

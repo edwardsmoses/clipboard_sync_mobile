@@ -22,17 +22,17 @@ Open `clipboard_sync_desktop/clipboard_sync_desktop.xcodeproj` in Xcode 16 and r
 - A live clipboard watcher that captures text, rich text, and images from the general pasteboard.
 - Persistent on-device history stored under Application Support (capped at 500 entries).
 - A SwiftUI split view that groups pinned items, previews content, and exposes metadata.
-- A Network.framework-based WebSocket listener (advertised over Bonjour) ready to receive Android clients.
+- A relay-backed WebSocket client that connects to `bridge.edwardsmoses.com` and fans out clipboard updates to every paired phone.
 
 ## Pairing flow (current snapshot)
 
-1. Launch the macOS bridge — it will spin up the WebSocket listener and begin watching the pasteboard.
-2. On Android, check the Devices tab — both gadgets should show the same Wi‑Fi badge. Tap “Pair a device” and scan the Mac’s QR code.
-3. Copy anything and watch it glow in the new Clipboard Vault timeline; the macOS bridge broadcasts its own clipboard events to all paired clients.
+1. Launch the macOS bridge — it mints a secure relay session, begins syncing the pasteboard, and shows a one-time pairing code.
+2. On Android, visit the Devices tab, tap “Pair a device,” and enter the 12-character code from the Mac. The phone dials `bridge.edwardsmoses.com` over TLS, so no LAN tweaks are required.
+3. Copy anything and watch it glow in the Clipboard Vault timeline; the relay keeps every paired device in sync even when they’re on different networks.
 
 ## Next steps
 
-- Harden the WebSocket handshake with mutual TLS and QR-based onboarding.
+- Add relay-side authentication/rate limiting plus a QR-based onboarding shortcut.
 - Promote the Android clipboard watcher into a foreground service for reliability on OEM builds.
 - Build menu bar & launch-agent helpers on macOS so the bridge runs headless.
 - Expand payload support to include files and contextual metadata (app name, source URL, etc.).

@@ -41,7 +41,7 @@ export default function DevicesScreen() {
     if (network.type === 'WIFI') {
       return network.details?.ssid ? `Wi‑Fi · ${network.details.ssid}` : 'Wi‑Fi connected';
     }
-    return 'Not on Wi‑Fi';
+    return 'Online';
   }, [network]);
 
   return (
@@ -53,7 +53,7 @@ export default function DevicesScreen() {
               <Text style={styles.heroOverline}>Status</Text>
               <Text style={styles.heroTitle}>Paired successfully</Text>
               <Text style={styles.heroSubtitle}>
-                Copy on either device to sync instantly. Keep both on the same Wi‑Fi for best results.
+                Copy on either device to sync instantly over the secure relay. Works anywhere you have an internet connection.
               </Text>
               <View style={styles.heroTag}>
                 <Text style={styles.heroTagText}>{isConnected ? 'Connected' : 'Connecting…'} · {networkBadge}</Text>
@@ -78,7 +78,7 @@ export default function DevicesScreen() {
               <Text style={styles.heroOverline}>Quick pairing</Text>
               <Text style={styles.heroTitle}>Bring your Mac nearby</Text>
               <Text style={styles.heroSubtitle}>
-                Make sure both devices are awake and connected to the same Wi‑Fi network. Your Mac will show a one-time code when it’s ready.
+                Open the macOS companion to generate a one-time code. Enter it below to pair.
               </Text>
               <View style={styles.heroTag}>
                 <Text style={styles.heroTagText}>{networkBadge}</Text>

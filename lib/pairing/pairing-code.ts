@@ -1,63 +1,32 @@
+import { RELAY_WEBSOCKET_URL } from '@/constants/relay';
+
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-const CHAR_TO_VALUE = new Map<string, number>(
-  Array.from(ALPHABET).map((char, index) => [char, index]),
-);
+const ALLOWED_CHARS = new Set(ALPHABET.split(''));
+const TOKEN_LENGTH = 12;
 
 export interface PairingCodeResult {
   endpoint: string;
 }
 
 export function decodePairingCode(input: string): PairingCodeResult | null {
-  const sanitized = input.toUpperCase().split('').filter((char) => CHAR_TO_VALUE.has(char));
-  if (sanitized.length < 12) {
+  const sanitized = normalizeCode(input);
+  if (sanitized.length !== TOKEN_LENGTH) {
     return null;
   }
-
-  const bytes = base32Decode(sanitized.join(''));
-  if (bytes.length < 7) {
-    return null;
-  }
-
-  const ipBytes = bytes.slice(0, 4);
-  const portBytes = bytes.slice(4, 6);
-  const checksum = bytes[6];
-  const expected = [...ipBytes, ...portBytes].reduce((sum, value) => (sum + value) & 0xff, 0);
-
-  if (checksum !== expected) {
-    return null;
-  }
-
-  const address = ipBytes.join('.');
-  const port = (portBytes[0] << 8) | portBytes[1];
-
-  if (Number.isNaN(port) || port < 1 || port > 65535) {
-    return null;
-  }
-
   return {
-    endpoint: `ws://${address}:${port}`,
+    endpoint: buildRelayEndpoint(sanitized),
   };
 }
 
-function base32Decode(value: string): number[] {
-  let buffer = 0;
-  let bitsLeft = 0;
-  const output: number[] = [];
+function normalizeCode(value: string): string {
+  return value
+    .toUpperCase()
+    .split('')
+    .filter((char) => ALLOWED_CHARS.has(char))
+    .join('');
+}
 
-  for (const char of value) {
-    const digit = CHAR_TO_VALUE.get(char);
-    if (digit === undefined) {
-      continue;
-    }
-    buffer = (buffer << 5) | digit;
-    bitsLeft += 5;
-
-    if (bitsLeft >= 8) {
-      bitsLeft -= 8;
-      const byte = (buffer >> bitsLeft) & 0xff;
-      output.push(byte);
-    }
-  }
-
-  return output;
+function buildRelayEndpoint(token: string): string {
+  const separator = RELAY_WEBSOCKET_URL.includes('?') ? '&' : '?';
+  return `${RELAY_WEBSOCKET_URL}${separator}token=${encodeURIComponent(token)}&role=client`;
 }
