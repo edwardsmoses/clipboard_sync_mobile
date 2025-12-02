@@ -36,3 +36,10 @@ Open `clipboard_sync_desktop/clipboard_sync_desktop.xcodeproj` in Xcode 16 and r
 - Promote the Android clipboard watcher into a foreground service for reliability on OEM builds.
 - Build menu bar & launch-agent helpers on macOS so the bridge runs headless.
 - Expand payload support to include files and contextual metadata (app name, source URL, etc.).
+
+
+
+## Deploy
+
+- Android: eas build --profile preview --platform android
+- Desktop: Release Archive, export app, create dmg:  create-dmg app.app
