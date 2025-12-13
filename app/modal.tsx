@@ -3,13 +3,12 @@ import React, { useMemo } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { useClipboardHistory } from '@/context/clipboard-history-context';
-import { copyTextToClipboard } from '@/lib/clipboard/monitor';
 import { GradientContainer } from '@/components/ui/gradient-container';
 
 export default function ModalScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ entryId?: string }>();
-  const { entries } = useClipboardHistory();
+  const { entries, copyEntryToClipboard } = useClipboardHistory();
 
   const entry = useMemo(
     () => entries.find((item) => item.id === params.entryId),
@@ -37,7 +36,7 @@ export default function ModalScreen() {
     if (!entry.text) {
       return;
     }
-    const copied = await copyTextToClipboard(entry.text);
+    const copied = await copyEntryToClipboard(entry);
     if (copied) {
       Alert.alert('Copied', 'The clipboard entry has been copied.');
     } else {

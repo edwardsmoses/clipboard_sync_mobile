@@ -8,7 +8,12 @@ import React, {
   useRef,
 } from 'react';
 
-import { ClipboardMonitor, type ClipboardSnapshot } from '@/lib/clipboard/monitor';
+import {
+  ClipboardMonitor,
+  fingerprintSnapshot,
+  type ClipboardSnapshot,
+  copyTextToClipboard,
+} from '@/lib/clipboard/monitor';
 import type { DeviceIdentity } from '@/lib/device/identity';
 import { getDeviceIdentity } from '@/lib/device/identity';
 import type { ClipboardEntry, RemoteClipboardEvent } from '@/lib/models/clipboard';
@@ -79,6 +84,7 @@ interface ContextValue {
   remove(id: string): Promise<void>;
   togglePin(id: string, isPinned: boolean): Promise<void>;
   ingestRemoteEntry(entry: ClipboardEntry): Promise<void>;
+  copyEntryToClipboard(entry: ClipboardEntry): Promise<boolean>;
   clearAll(): Promise<void>;
 }
 
@@ -92,6 +98,7 @@ const ClipboardHistoryContext = createContext<ContextValue>({
   remove: async () => undefined,
   togglePin: async () => undefined,
   ingestRemoteEntry: async () => undefined,
+  copyEntryToClipboard: async () => false,
   clearAll: async () => undefined,
 });
 
@@ -103,6 +110,7 @@ export function ClipboardHistoryProvider({ children }: Props) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const monitorRef = useRef<ClipboardMonitor | null>(null);
   const syncClientRef = useRef<SyncClient | null>(null);
+  const suppressedFingerprintsRef = useRef<Set<string>>(new Set());
   const { settings, isReady: settingsReady } = useSettings();
 
   useEffect(() => {
@@ -144,6 +152,37 @@ export function ClipboardHistoryProvider({ children }: Props) {
     await HistoryStore.upsertEntry(entry);
     dispatch({ type: 'UPSERT_ENTRY', entry });
   }, []);
+
+  const suppressFingerprintOnce = useCallback((fingerprint: string) => {
+    suppressedFingerprintsRef.current.add(fingerprint);
+    setTimeout(() => {
+      suppressedFingerprintsRef.current.delete(fingerprint);
+    }, 6000);
+  }, []);
+
+  const copyEntryToClipboard = useCallback(
+    async (entry: ClipboardEntry) => {
+      if (!entry.text) {
+        return false;
+      }
+      const shouldSuppress = state.device ? entry.deviceId !== state.device.id : false;
+      const fingerprint = fingerprintSnapshot({
+        contentType: 'text',
+        text: entry.text,
+        html: null,
+        image: null,
+      });
+      if (shouldSuppress) {
+        suppressFingerprintOnce(fingerprint);
+      }
+      const copied = await copyTextToClipboard(entry.text);
+      if (!copied && shouldSuppress) {
+        suppressedFingerprintsRef.current.delete(fingerprint);
+      }
+      return copied;
+    },
+    [state.device, suppressFingerprintOnce],
+  );
 
   const clearAll = useCallback(async () => {
     await HistoryStore.clearEntries();
@@ -188,6 +227,14 @@ export function ClipboardHistoryProvider({ children }: Props) {
       await HistoryStore.upsertEntry(entry);
       dispatch({ type: 'UPSERT_ENTRY', entry });
       syncClientRef.current?.sendClipboardEntry(entry);
+    }, {
+      shouldIgnore: (_snapshot, fingerprint) => {
+        if (suppressedFingerprintsRef.current.has(fingerprint)) {
+          suppressedFingerprintsRef.current.delete(fingerprint);
+          return true;
+        }
+        return false;
+      },
     });
 
     monitorRef.current = monitor;
@@ -256,9 +303,10 @@ export function ClipboardHistoryProvider({ children }: Props) {
       remove,
       togglePin,
       ingestRemoteEntry,
+      copyEntryToClipboard,
       clearAll,
     }),
-    [clearAll, ingestRemoteEntry, refresh, remove, state.device, state.entries, state.isReady, state.serverName, state.syncState, togglePin],
+    [clearAll, copyEntryToClipboard, ingestRemoteEntry, refresh, remove, state.device, state.entries, state.isReady, state.serverName, state.syncState, togglePin],
   );
 
   return <ClipboardHistoryContext.Provider value={value}>{children}</ClipboardHistoryContext.Provider>;

@@ -15,14 +15,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useClipboardHistory } from "@/context/clipboard-history-context";
-import { copyTextToClipboard } from "@/lib/clipboard/monitor";
 import { GradientContainer } from "@/components/ui/gradient-container";
 import type { ClipboardEntry } from "@/lib/models/clipboard";
 import { useSettings } from "@/context/settings-context";
 
 export default function HistoryScreen() {
   const router = useRouter();
-  const { entries, isReady, syncState, refresh, togglePin, remove, clearAll } =
+  const { entries, isReady, syncState, refresh, togglePin, remove, clearAll, copyEntryToClipboard } =
     useClipboardHistory();
   const { settings } = useSettings();
   const [query, setQuery] = useState("");
@@ -196,7 +195,7 @@ function HistoryListItem({
     if (!entry.text) {
       return;
     }
-    const copied = await copyTextToClipboard(entry.text);
+    const copied = await copyEntryToClipboard(entry);
     if (copied) {
       await Haptics.selectionAsync();
     }

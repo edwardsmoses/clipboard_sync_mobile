@@ -8,6 +8,11 @@ export interface ClipboardSnapshot {
 }
 
 export type ClipboardMonitorCallback = (snapshot: ClipboardSnapshot) => void | Promise<void>;
+export type ClipboardMonitorShouldIgnore = (snapshot: ClipboardSnapshot, fingerprint: string) => boolean;
+
+export interface ClipboardMonitorOptions {
+  shouldIgnore?: ClipboardMonitorShouldIgnore;
+}
 
 const POLL_INTERVAL_MS = 1500;
 
@@ -111,7 +116,10 @@ export class ClipboardMonitor {
   private intervalId: ReturnType<typeof setInterval> | null = null;
   private lastFingerprint: string | null = null;
 
-  constructor(private readonly callback: ClipboardMonitorCallback) {}
+  constructor(
+    private readonly callback: ClipboardMonitorCallback,
+    private readonly options: ClipboardMonitorOptions = {},
+  ) {}
 
   start(): void {
     if (this.intervalId) {
@@ -137,8 +145,12 @@ export class ClipboardMonitor {
     if (!snapshot) {
       return;
     }
-    const hash = fingerprint(snapshot);
+    const hash = fingerprintSnapshot(snapshot);
     if (hash === this.lastFingerprint) {
+      return;
+    }
+    if (this.options.shouldIgnore?.(snapshot, hash)) {
+      this.lastFingerprint = hash;
       return;
     }
     this.lastFingerprint = hash;
@@ -146,7 +158,7 @@ export class ClipboardMonitor {
   }
 }
 
-function fingerprint(snapshot: ClipboardSnapshot): string {
+export function fingerprintSnapshot(snapshot: ClipboardSnapshot): string {
   return JSON.stringify({
     type: snapshot.contentType,
     text: snapshot.text ?? null,
