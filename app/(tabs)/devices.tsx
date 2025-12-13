@@ -3,11 +3,11 @@ import * as Updates from 'expo-updates';
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { useClipboardHistory } from '@/context/clipboard-history-context';
 import { useSettings } from '@/context/settings-context';
 import { useNetworkSummary } from '@/lib/network/network-status';
+import { ScreenShell } from '@/components/ScreenShell';
+import { StatusPill } from '@/components/StatusPill';
 const palette = {
   background: '#f6f7fb',
   surface: '#ffffff',
@@ -56,7 +56,10 @@ export default function DevicesScreen() {
   }, [network]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenShell
+      title="ClipBridge"
+      status={<StatusPill state={isConnected ? 'syncing' : 'waiting'} detail={networkBadge} />}
+    >
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.hero}>
           {isPaired ? (
@@ -170,7 +173,7 @@ export default function DevicesScreen() {
           ) : null}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 

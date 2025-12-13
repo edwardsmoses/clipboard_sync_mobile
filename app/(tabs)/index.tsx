@@ -12,7 +12,8 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusPill } from "@/components/StatusPill";
+import { ScreenShell } from "@/components/ScreenShell";
 
 import { useClipboardHistory } from "@/context/clipboard-history-context";
 import type { ClipboardEntry } from "@/lib/models/clipboard";
@@ -44,35 +45,19 @@ export default function HistoryScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container]}>
-      <View style={styles.hero}>
-        <Text style={styles.heroTitle}>ClipBridge</Text>
-        <Text style={styles.heroSubtitle}>
-           Your snippets travel with you. Tap to reuse instantly.
-        </Text>
-        <View style={styles.heroRow}>
-          <View style={styles.heroChip}>
-            <View
-              style={[
-                styles.statusDot,
-                { backgroundColor: getStatusColor(syncState) },
-              ]}
-            />
-            <Text style={styles.heroChipText}>
-              {formatSyncState(syncState)}
-            </Text>
-          </View>
-          <View style={styles.heroChip}>
-            <MaterialIcons name="layers" color="#dbeafe" size={16} />
-            <Text style={styles.heroChipText}>{entries.length} saved</Text>
-          </View>
-        </View>
-        {!isPaired && (
+    <ScreenShell
+      title="ClipBridge"
+      status={<StatusPill state={syncState === "connected" ? "syncing" : "waiting"} detail={`${entries.length} saved`} />}
+      rightAction={
+        !isPaired ? (
           <Pressable style={styles.pairCta} onPress={() => router.push("/pair")}>
             <MaterialIcons name="phonelink" size={16} color="#0f172a" />
             <Text style={styles.pairCtaText}>Pair a device</Text>
           </Pressable>
-        )}
+        ) : null
+      }
+    >
+      <View style={styles.hero}>
         <View style={styles.searchBar}>
           <MaterialIcons name="search" size={20} color="rgba(15,23,42,0.55)" />
           <TextInput
@@ -164,7 +149,7 @@ export default function HistoryScreen() {
           )
         }
       />
-    </SafeAreaView>
+    </ScreenShell>
   );
 }
 
