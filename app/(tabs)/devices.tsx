@@ -8,7 +8,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useClipboardHistory } from '@/context/clipboard-history-context';
 import { useSettings } from '@/context/settings-context';
 import { useNetworkSummary } from '@/lib/network/network-status';
-import { GradientContainer } from '@/components/ui/gradient-container';
+const palette = {
+  background: '#f6f7fb',
+  surface: '#ffffff',
+  border: 'rgba(15,23,42,0.06)',
+  accent: '#4f8cff',
+  text: '#0f172a',
+  muted: '#64748b',
+};
 
 function formatTimestamp(timestamp: number) {
   const date = new Date(timestamp);
@@ -51,7 +58,7 @@ export default function DevicesScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <GradientContainer colors={[(isPaired ? '#065f46' : '#1e3a8a')]} style={styles.hero}>
+        <View style={styles.hero}>
           {isPaired ? (
             <>
               <Text style={styles.heroOverline}>Status</Text>
@@ -97,7 +104,7 @@ export default function DevicesScreen() {
               </Pressable>
             </>
           )}
-        </GradientContainer>
+        </View>
 
         {isPaired && (
           <View style={styles.surface}>
@@ -181,36 +188,37 @@ function Step({ index, label }: { index: number; label: string }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#eef2ff',
+    backgroundColor: palette.background,
   },
   content: {
-    padding: 24,
-    gap: 24,
+    padding: 20,
+    gap: 20,
   },
   hero: {
-    borderRadius: 32,
-    padding: 24,
-    gap: 16,
-    shadowColor: '#0f172a',
-    shadowOpacity: 0.3,
-    shadowRadius: 22,
-    elevation: 8,
+    borderRadius: 18,
+    padding: 18,
+    gap: 12,
+    backgroundColor: palette.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: palette.border,
+    shadowOpacity: 0,
+    elevation: 0,
   },
   heroOverline: {
     textTransform: 'uppercase',
     fontSize: 12,
     letterSpacing: 1.4,
-    color: 'rgba(255,255,255,0.7)',
+    color: palette.muted,
     fontWeight: '600',
   },
   heroTitle: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
-    color: '#fff',
+    color: palette.text,
   },
   heroSubtitle: {
-    fontSize: 15,
-    color: 'rgba(255,255,255,0.8)',
+    fontSize: 13,
+    color: palette.muted,
     lineHeight: 22,
   },
   heroTag: {
@@ -218,10 +226,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: '#eef2ff',
   },
   heroTagText: {
-    color: '#fff',
+    color: palette.text,
     fontWeight: '600',
   },
   heroSteps: {
@@ -237,61 +245,61 @@ const styles = StyleSheet.create({
     height: 28,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.6)',
+    borderColor: palette.border,
     justifyContent: 'center',
     alignItems: 'center',
   },
   stepBadgeText: {
-    color: '#fff',
+    color: palette.text,
     fontWeight: '700',
   },
   stepLabel: {
-    color: '#f1f5ff',
+    color: palette.text,
     fontSize: 15,
   },
   heroButton: {
     marginTop: 4,
     alignSelf: 'flex-start',
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#e8edff',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 999,
   },
   heroButtonText: {
-    color: '#0f172a',
-    fontWeight: '700',
-    fontSize: 16,
+    color: '#1d4ed8',
+    fontWeight: '600',
+    fontSize: 15,
   },
   surface: {
-    backgroundColor: '#ffffff',
-    borderRadius: 28,
-    padding: 20,
-    gap: 16,
-    shadowColor: '#1e1f38',
-    shadowOpacity: 0.08,
-    shadowRadius: 18,
-    elevation: 4,
+    backgroundColor: palette.surface,
+    borderRadius: 18,
+    padding: 16,
+    gap: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: palette.border,
+    shadowOpacity: 0,
+    elevation: 0,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#111827',
+    color: palette.text,
   },
   selfCard: {
     gap: 6,
   },
   selfName: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#111827',
+    fontWeight: '600',
+    color: palette.text,
   },
   selfMeta: {
     fontSize: 14,
-    color: '#6b7280',
+    color: palette.muted,
   },
   selfStatus: {
     fontSize: 13,
-    color: '#4b5563',
+    color: palette.muted,
     marginTop: 4,
   },
   statusChip: {
@@ -303,12 +311,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   statusChipPositive: {
-    backgroundColor: '#dcfce7',
-    color: '#166534',
+    backgroundColor: '#e8edff',
+    color: '#1d4ed8',
   },
   statusChipMuted: {
-    backgroundColor: '#e0e7ff',
-    color: '#4338ca',
+    backgroundColor: '#f3f4f6',
+    color: palette.muted,
   },
   settingRow: {
     flexDirection: 'row',
@@ -325,17 +333,17 @@ const styles = StyleSheet.create({
   },
   aboutSection: { gap: 4, paddingHorizontal: 4 },
   aboutHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  aboutTitle: { fontSize: 16, fontWeight: '700', color: '#1f2937' },
+  aboutTitle: { fontSize: 16, fontWeight: '700', color: palette.text },
   versionBadge: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
-    backgroundColor: '#eef2ff',
-    color: '#4338ca',
+    backgroundColor: '#e8edff',
+    color: '#1d4ed8',
     fontSize: 12,
     fontWeight: '700',
   },
-  aboutSubtitle: { fontSize: 13, color: '#6b7280' },
+  aboutSubtitle: { fontSize: 13, color: palette.muted },
   aboutCaption: { fontSize: 12, color: '#9ca3af' },
   deviceRow: {
     paddingVertical: 14,

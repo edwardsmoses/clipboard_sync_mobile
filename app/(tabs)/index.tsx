@@ -15,7 +15,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useClipboardHistory } from "@/context/clipboard-history-context";
-import { GradientContainer } from "@/components/ui/gradient-container";
 import type { ClipboardEntry } from "@/lib/models/clipboard";
 import { useSettings } from "@/context/settings-context";
 
@@ -46,10 +45,10 @@ export default function HistoryScreen() {
 
   return (
     <SafeAreaView style={[styles.container]}>
-      <GradientContainer colors={["#1d4ed8"]} style={styles.hero}>
-        <Text style={styles.heroTitle}>Clipboard vault</Text>
+      <View style={styles.hero}>
+        <Text style={styles.heroTitle}>ClipBridge</Text>
         <Text style={styles.heroSubtitle}>
-          Your snippets travel with you. Tap to reuse instantly.
+           Your snippets travel with you. Tap to reuse instantly.
         </Text>
         <View style={styles.heroRow}>
           <View style={styles.heroChip}>
@@ -117,11 +116,11 @@ export default function HistoryScreen() {
           <MaterialIcons
             name="delete-sweep"
             size={16}
-            color="rgba(255,255,255,0.85)"
+            color="#cbd5e1"
           />
           <Text style={styles.clearAllText}>Delete all</Text>
         </Pressable>
-      </GradientContainer>
+      </View>
 
       <FlashList<ClipboardEntry>
         data={filteredEntries}
@@ -265,31 +264,29 @@ function getContentIcon(contentType: ClipboardEntry["contentType"]) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#eef2ff",
-  },
-  containerDark: {
-    backgroundColor: "#0f172a",
+    backgroundColor: "#f6f7fb",
   },
   hero: {
-    padding: 24,
-    paddingBottom: 32,
-    gap: 16,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    shadowColor: "#0f172a",
-    shadowOpacity: 0.35,
-    shadowRadius: 26,
-    elevation: 10,
+    marginHorizontal: 16,
+    marginTop: 12,
+    padding: 18,
+    gap: 12,
+    borderRadius: 18,
+    backgroundColor: "#ffffff",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(15,23,42,0.06)",
+    shadowOpacity: 0,
+    elevation: 0,
   },
   heroTitle: {
-    fontSize: 30,
+    fontSize: 22,
     fontWeight: "700",
-    color: "#f8fafc",
+    color: "#0f172a",
   },
   heroSubtitle: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: "rgba(248,250,252,0.8)",
+    fontSize: 13,
+    lineHeight: 19,
+    color: "#475569",
   },
   heroRow: {
     flexDirection: "row",
@@ -307,9 +304,9 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   clearAllText: {
-    color: "rgba(255,255,255,0.85)",
+    color: "#475569",
     fontWeight: "600",
-    fontSize: 13,
+    fontSize: 12,
   },
   pairCta: {
     marginTop: 8,
@@ -317,13 +314,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: "#f9fafb",
+    backgroundColor: "#e8edff",
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 999,
   },
   pairCtaText: {
-    color: "#0f172a",
+    color: "#1d4ed8",
     fontWeight: "700",
   },
   heroChip: {
@@ -333,10 +330,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: "rgba(255,255,255,0.14)",
+    backgroundColor: "#eef2ff",
   },
   heroChipText: {
-    color: "#dbeafe",
+    color: "#0f172a",
     fontWeight: "600",
   },
   statusDot: {
@@ -345,22 +342,22 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   searchBar: {
-    marginTop: 8,
+    marginTop: 6,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    backgroundColor: "rgba(248,250,252,0.9)",
+    backgroundColor: "#f3f4f6",
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 999,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     color: "#0f172a",
   },
   searchBadge: {
-    backgroundColor: "#1d4ed8",
+    backgroundColor: "#4f8cff",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
@@ -371,10 +368,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   listContent: {
-    paddingTop: 20,
-    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingHorizontal: 16,
     paddingBottom: 120,
-    backgroundColor: "#eef2ff",
+    backgroundColor: "#f6f7fb",
   },
   separator: { height: 12 },
   card: {
@@ -384,6 +381,8 @@ const styles = StyleSheet.create({
     gap: 8,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "#e5e7eb",
+    shadowOpacity: 0,
+    elevation: 0,
   },
   cardPressed: {
     opacity: 0.9,
@@ -396,15 +395,15 @@ const styles = StyleSheet.create({
   cardDevice: {
     flex: 1,
     fontWeight: "600",
-    color: "#111827",
+    color: "#0f172a",
   },
   cardTimestamp: {
-    fontSize: 12,
-    color: "#9ca3af",
+    fontSize: 11,
+    color: "#6b7280",
   },
   cardText: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 19,
     color: "#1f2937",
   },
   cardFooter: {
@@ -418,14 +417,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: "transparent",
-    color: "#6b7280",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#d1d5db",
-  },
-  pillActive: {
     backgroundColor: "#f3f4f6",
     color: "#374151",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "#e5e7eb",
+  },
+  pillActive: {
+    backgroundColor: "#e8edff",
+    color: "#1d4ed8",
   },
   deletePill: {
     backgroundColor: "transparent",
@@ -441,7 +440,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#1f2937",
+    color: "#0f172a",
   },
   emptySubtitle: {
     fontSize: 14,

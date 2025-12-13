@@ -81,37 +81,38 @@ export default function ModalScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 24,
+    padding: 22,
     gap: 16,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#f6f7fb',
   },
   caption: {
     fontSize: 12,
     textTransform: 'uppercase',
-    color: '#9CA3AF',
+    color: '#64748b',
     letterSpacing: 1.1,
   },
   title: {
     fontSize: 22,
     fontWeight: '700',
+    color: '#0f172a',
   },
   body: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#475569',
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(15,23,42,0.06)',
+    shadowOpacity: 0,
+    elevation: 0,
   },
   content: {
     fontSize: 16,
     lineHeight: 22,
-    color: '#1F2937',
+    color: '#0f172a',
   },
   metaRow: {
     flexDirection: 'row',
@@ -120,25 +121,26 @@ const styles = StyleSheet.create({
   },
   metaLabel: {
     fontSize: 13,
-    color: '#6B7280',
+    color: '#64748b',
   },
   metaValue: {
     fontSize: 13,
     fontWeight: '600',
+    color: '#0f172a',
   },
   primaryAction: {
-    backgroundColor: '#2563EB',
-    color: '#FFFFFF',
+    backgroundColor: '#4f8cff',
+    color: '#ffffff',
     paddingVertical: 14,
     borderRadius: 12,
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
   },
   secondaryAction: {
     textAlign: 'center',
-    color: '#2563EB',
-    fontSize: 15,
+    color: '#1d4ed8',
+    fontSize: 14,
     fontWeight: '600',
   },
   link: {
@@ -161,7 +163,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#f9fafb',
+    color: '#e2e8f0',
   },
   emptySubtitle: {
     fontSize: 15,
