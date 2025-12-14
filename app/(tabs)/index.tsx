@@ -121,6 +121,7 @@ export default function HistoryScreen() {
             entry={item}
             onTogglePin={() => togglePin(item.id, !item.isPinned)}
             onDelete={() => remove(item.id)}
+            onCopy={copyEntryToClipboard}
             onInspect={() =>
               router.push({ pathname: "/modal", params: { entryId: item.id } })
             }
@@ -158,6 +159,7 @@ interface HistoryListItemProps {
   onTogglePin(): void;
   onDelete(): void;
   onInspect(): void;
+  onCopy(entry: ClipboardEntry): Promise<boolean>;
 }
 
 function HistoryListItem({
@@ -165,6 +167,7 @@ function HistoryListItem({
   onTogglePin,
   onDelete,
   onInspect,
+  onCopy,
 }: HistoryListItemProps) {
   const createdAt = new Date(entry.createdAt);
   const formattedTime = `${createdAt.toLocaleDateString()} · ${createdAt.toLocaleTimeString(
@@ -179,7 +182,7 @@ function HistoryListItem({
     if (!entry.text) {
       return;
     }
-    const copied = await copyEntryToClipboard(entry);
+    const copied = await onCopy(entry);
     if (copied) {
       await Haptics.selectionAsync();
     }
